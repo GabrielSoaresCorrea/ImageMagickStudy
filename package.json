@@ -1,0 +1,24 @@
+{
+  "name": "imagemagick-windows-7",
+  "version": "1.0.0",
+  "description": "This document describes the requirements and instructions to build ImageMagick for Windows on your own machine.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ImageMagick/ImageMagick-Windows.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ImageMagick/ImageMagick-Windows/issues"
+  },
+  "homepage": "https://github.com/ImageMagick/ImageMagick-Windows#readme",
+  "dependencies": {
+    "@babel/runtime": "^7.20.13",
+    "svg2img": "^1.0.0-beta.2",
+    "tinycolor2": "^1.6.0"
+  }
+}
