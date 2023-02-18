@@ -22,11 +22,16 @@ const listOfWidth16for9 = [
   1800,
 ];
 
+const athenaThemeColor = "#D4AF37";
+const poseidonThemeColor = "#2D848A";
+const apolloThemeColor = '#908429';
+const zoeThemeColor = '#102849';
+
 const height = listOfHeight16for9[3];
 const width = listOfWidth16for9[3];
 const svgMaxSize = width / 4;
-const backgroundColor = '#2D848A';
-const pathSvg =  'zzImagens/trident.svg'
+const backgroundColor = zoeThemeColor;
+const pathSvg =  'zzImagens/Zoe.svg'
 const backgroundOutput = 'backgroundOutput.png'
 
 const backgroundTC = tinycolor(backgroundColor);
@@ -58,13 +63,12 @@ function changeSvgStroke(strokeColor) {
       const svgElement = result.svg;
       if (path && path.$) {
         path.$.stroke = strokeColor;
+        path.$.fill = strokeColor;
 
         // Modify the attributes of the <svg> element
         svgElement.$.width = svgMaxSize;
         svgElement.$.height = svgMaxSize;
       }
-
-
 
       // Convert the modified XML data back to a string
       const builder = new xml2js.Builder();
