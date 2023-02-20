@@ -22,29 +22,33 @@ const listOfWidth16for9 = [
   1800,
 ];
 
-const athenaThemeColor = "#D4AF37";
-const poseidonThemeColor = "#2D848A";
-const apolloThemeColor = '#908429';
-const zoeThemeColor = '#102849';
+const themesColors = {
+  athena: "#D4AF37",
+  apollo: '#908429',
+  poseidon: "#2D848A",
+  zoe: '#102849',
+}
+
+const pathSvg = {
+  athena: 'Svg/Athena.svg',
+  apollo: 'Svg/Apollo.svg',
+  poseidon: 'Svg/Poseidon.svg',
+  zoe: 'Svg/Zoe.svg'
+}
 
 const height = listOfHeight16for9[3];
 const width = listOfWidth16for9[3];
 const svgMaxSize = width / 4;
-const backgroundColor = zoeThemeColor;
-const pathSvg =  'zzImagens/Zoe.svg'
-const backgroundOutput = 'backgroundOutput.png'
 
+const backgroundColor = themesColors.poseidon;
+const centerSvg =  pathSvg.poseidon;
+
+const backgroundOutput = 'backgroundOutput.png';
 const backgroundTC = tinycolor(backgroundColor);
-
-if(backgroundTC.isDark()) {
-  changeSvgStroke('#fff');
-} else {
-  changeSvgStroke('#000');
-}
 
 function changeSvgStroke(strokeColor) {
   // Read the SVG file
-  fs.readFile(pathSvg, 'utf-8', (err, data) => {
+  fs.readFile(centerSvg, 'utf-8', (err, data) => {
     if (err) {
       console.error(err);
       return;
@@ -75,7 +79,7 @@ function changeSvgStroke(strokeColor) {
       const modifiedData = builder.buildObject(result);
 
       // Write the modified SVG file
-      fs.writeFile(pathSvg, modifiedData, (err) => {
+      fs.writeFile(centerSvg, modifiedData, (err) => {
         if (err) {
           console.error(err);
           return;
@@ -87,51 +91,76 @@ function changeSvgStroke(strokeColor) {
   });
 }
 
+if(backgroundTC.isDark()) {
+  changeSvgStroke('#fff');
+} else {
+  changeSvgStroke('#000');
+}
 
+function createDesktopColor(height, width, backgroundColor) {
 
-gm(height, width, backgroundColor)
-  .write(backgroundOutput, (err) => {
+  gm(height, width, backgroundColor)
+  .write(backgroundOutput,
+  (err => {
+    if(err) throw err;
+    console.log('Background Complete');
+    passSvgToImg(centerSvg);
+  }));
 
-    if(err) console.log(err);
-    console.log('background Feito');
+};
 
-    svg2img(pathSvg, (error, buffer) => {
+function passSvgToImg(pathSvg) {
 
-      if (error) console.log(error);
-      console.log('svg2img');
-      const tempPng = 'temp.png';
-
-      fs.writeFileSync(tempPng, buffer);
-      console.log('arquivo png temporario criado');
-    
-      // Get the dimensions of the input image and the temporary PNG file
-      gm(backgroundOutput).size((err, size) => {
-        if (err) console.log(err);
-        console.log(size)
-        gm(tempPng)
-        .size((err, pngSize) => {
-          if (err) console.log(err);
-          console.log(pngSize)
-    
-          // Calculate the position of the PNG to center it within the input image
-          const x = Math.round((size.width - pngSize.width) / 2);
-          console.log(x)
-          const y = Math.round((size.height - pngSize.height) / 2);
-          console.log(y)
-          
-          // Add the PNG to the image using the -geometry option
-          gm(backgroundOutput)
-            .geometry(`+${x}+${y}`)
-            .composite(tempPng)
-            // Write the output image to a file
-            .write('output.png', (err) => {
-              if (err) console.log(err);
-              console.log('Imagem salva');
-              // Remove the temporary PNG file
-              fs.unlinkSync(tempPng);
-              console.log('Arquivo png temporario apagado')
-            });
-        });
-      });
-    });
+  svg2img(pathSvg, (err, buffer) => {
+    if (err) throw err;
+    createTemporaryPng(buffer);
   });
+}
+
+function createTemporaryPng(buffer) {
+  const tempPng = 'temp.png';
+  
+  fs.writeFileSync(tempPng, buffer);
+  console.log('Temporary png archive created');
+
+  getDimensions(backgroundOutput, tempPng);
+};
+
+function getDimensions(colorWallpaper, tempPng) {
+  gm(colorWallpaper).size((err, size) => {
+    if (err) throw err;
+    gm(tempPng)
+      .size((err, pngSize) => {
+        if (err) throw err;
+        createFinalWallpaper(backgroundOutput, tempPng, size, pngSize);
+      });
+  });
+};
+
+function calculateHeightToCenter(wallpaperSize, pngSize) {
+  const finalHeight = Math.round((wallpaperSize.height - pngSize.height) / 2);
+  return finalHeight;
+};
+
+function calculateWidthToCenter(wallpaperSize, pngSize) {
+  const finalWidth = Math.round((wallpaperSize.width - pngSize.width) / 2);
+  return finalWidth;
+};
+
+function createFinalWallpaper(colorWallpaper, tempPng, wallpaperSize, pngSize) {
+
+  const widthCalc = calculateWidthToCenter(wallpaperSize, pngSize);
+  const heightCalc = calculateHeightToCenter(wallpaperSize, pngSize);
+
+  gm(colorWallpaper)
+    .geometry(`+${widthCalc}+${heightCalc}`)
+    .composite(tempPng)
+    .write('final wallpaper.png', (err) => {
+      if(err) throw err;
+      console.log('saved image');
+      fs.unlinkSync(tempPng);
+      console.log('deleted temporary png file');
+    });
+};
+
+createDesktopColor(height, width, backgroundColor);
